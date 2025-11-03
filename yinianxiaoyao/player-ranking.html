@@ -80,6 +80,16 @@
             font-size: 1rem;
         }
 
+        /* 在现有样式中添加 */
+        .param-item select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0d0b5;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+
         .btn-group {
             display: flex;
             gap: 10px;
@@ -186,23 +196,25 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        /* 排名标识 */
+        /* 修改排名标识样式 */
         .rank-badge {
             position: absolute;
             top: -10px;
             left: 20px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+            padding: 4px 10px; /* 改为自适应宽度的内边距 */
+            border-radius: 4px; /* 圆角方块 */
             color: white;
-            display: flex;
+            display: inline-flex; /* 改为inline-flex适应内容宽度 */
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.9rem; /* 稍微缩小字体 */
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 28px; /* 确保小数字时有基本宽度 */
+            height: 28px; /* 固定高度保持一致性 */
         }
 
+        /* 保持原有的排名颜色样式 */
         .rank-1 { background-color: #e67e22; }
         .rank-2 { background-color: #3498db; }
         .rank-3 { background-color: #8e44ad; }
@@ -342,7 +354,7 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="site-title">逍遥战力榜</h1>
+    <h1 class="site-title">逍遥战力榜 (官方暂未开通大罗信息) </h1>
 
     <div class="search-filter">
         <div class="input-group">
@@ -357,7 +369,7 @@
 
         <div class="param-group">
             <div class="param-item">
-                <label for="sort">排序方式 (0:降序,1:升序)</label>
+                <label for="sort">排序</label>
                 <input type="number" id="sort" value="0" min="0">
             </div>
             <div class="param-item">
@@ -368,7 +380,42 @@
                 <label for="size">每页条数</label>
                 <input type="number" id="size" value="10" min="1" max="100">
             </div>
-        </div>
+            <!-- 在param-group中添加新的参数项 -->
+            <div class="param-item">
+                <label for="name">名称</label>
+                <input type="text" id="name" placeholder="名称">
+            </div>
+            <div class="param-item">
+                <label for="job">职业</label>
+                <select id="job" class="param-item input">
+                    <option value="">全部</option>
+                    <option value="fa">法修</option>
+                    <option value="ti">体修</option>
+                    <option value="jian">剑修</option>
+                    <option value="gui">鬼修</option>
+                    <option value="ru">儒修</option>
+                </select>
+            </div>
+            <!-- 在param-group中添加等级选择下拉框 -->
+            <div class="param-item">
+                <label for="level">境界</label>
+                <select id="level" class="param-item input">
+                    <option value="">全部</option>
+                    <option value="2">练气</option>
+                    <option value="3">筑基</option>
+                    <option value="4">结丹</option>
+                    <option value="5">元婴</option>
+                    <option value="6">化神</option>
+                    <option value="7">返虚</option>
+                    <option value="8">合体</option>
+                    <option value="9">大乘</option>
+                    <option value="10">渡劫</option>
+                    <option value="11">真仙</option>
+                    <option value="12">金仙</option>
+                    <option value="13">太乙</option>
+                    <option value="14">大罗</option>
+                </select>
+            </div>
 
         <div class="btn-group">
             <button class="btn fetch-btn" onclick="fetchApiData()">获取玩家数据</button>
@@ -407,6 +454,10 @@
         document.getElementById("sort").value = DEFAULT_SORT;
         document.getElementById("page").value = DEFAULT_PAGE;
         document.getElementById("size").value = DEFAULT_SIZE;
+        // 重置新添加的字段
+        document.getElementById("name").value = "";
+        document.getElementById("level").value = "";
+        document.getElementById("job").value = "";
     }
 
     // 切换页码
@@ -427,6 +478,10 @@
         const sort = document.getElementById("sort").value.trim();
         const page = document.getElementById("page").value.trim();
         const size = document.getElementById("size").value.trim();
+        // 获取新添加的参数
+        const name = document.getElementById("name").value.trim();
+        const level = document.getElementById("level").value.trim();
+        const job = document.getElementById("job").value.trim();
 
         // 验证必要参数
         if (!baseUrl) return null;
@@ -439,6 +494,11 @@
         params.append('sort', sort);
         params.append('page', page);
         params.append('size', size);
+
+        // 添加新参数（只在有值时添加）
+        if (name) params.append('name', name);
+        if (level) params.append('level', level);
+        if (job) params.append('job', job);
 
         // 拼接基础URL和参数
         return baseUrl.includes('?')
@@ -514,8 +574,9 @@
                         });
                     }
 
-                    // 战力格式化
-                    const formattedCombat = player.combat.toLocaleString();
+                    // 替换原来的战力格式化代码
+                    const formattedCombat = formatNumberWithUnits(player.combat);
+                    const formattedJon = formatNumberWithUnits(player.job);
 
                     // 卡片HTML
                     html += `
@@ -526,6 +587,10 @@
                                 <span class="job-tag ${jobClass}">${jobText}</span>
                             </div>
                             <div class="player-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">等级</span>
+                                    <span class="stat-value">${player.job || "0"}</span>
+                                </div>
                                 <div class="stat-item">
                                     <span class="stat-label">等级</span>
                                     <span class="stat-value">${player.level || "0"}</span>
@@ -584,6 +649,42 @@
             pagination.style.display = "none";
             console.error("错误详情：", error);
         }
+    }
+
+    // 数字格式化：转换为带汉字单位的格式（万、亿、兆）
+    // 数字格式化：保留完整数值并插入单位分隔符（兆、亿、万）
+    function formatNumberWithUnits(num) {
+        // 处理非数字情况
+        if (isNaN(num) || num === null || num === undefined) return "0";
+
+        // 转换为字符串处理
+        let str = Math.floor(num).toString();
+        let result = [];
+
+        // 从右向左每4位一组处理
+        while (str.length > 0) {
+            // 最后一组可能不足4位
+            const chunk = str.length >= 4 ? str.slice(-4) : str;
+            result.unshift(chunk);
+            // 截取剩余部分
+            str = str.slice(0, str.length - 4);
+        }
+
+        // 定义单位（从大到小）
+        const units = ['兆 ', '亿 ', '万 ', ''];
+        // 计算需要使用的单位起始索引
+        const unitStartIndex = units.length - result.length;
+
+        // 拼接结果
+        let formatted = '';
+        result.forEach((chunk, index) => {
+            // 只在非零 chunk 后添加单位
+            const unit = units[unitStartIndex + index];
+            formatted += chunk + (chunk !== '0000' ? unit : '');
+        });
+
+        // 处理特殊情况（如全零）
+        return formatted || '0';
     }
 </script>
 </body>
