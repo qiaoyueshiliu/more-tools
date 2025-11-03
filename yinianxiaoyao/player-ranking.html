@@ -361,27 +361,27 @@
             background-color: #42a5f5;
         }
 
-        /* 法修 - 蓝色 */
+        /* 法修 -  */
         .job-ti {
-            background-color: #66bb6a;
+            background-color: #ff4500;
         }
 
-        /* 体修 - 绿色 */
+        /* 体修 -  */
         .job-jian {
-            background-color: #f39c12;
+            background-color: #ffb142;
         }
 
-        /* 剑修 - 橙色 */
+        /* 剑修 -  */
         .job-gui {
             background-color: #9b59b6;
         }
 
-        /* 鬼修 - 紫色 */
+        /* 鬼修 -  */
         .job-ru {
-            background-color: #ec407a;
+            background-color: #225550;
         }
 
-        /* 儒修 - 粉色 */
+        /* 儒修 -  */
         .job-other {
             background-color: #78909c;
         }
@@ -512,21 +512,104 @@
             "default": {className: "job-other", name: "未知职业"}
         };
         // 在JavaScript部分添加境界映射关系
-        const faLevelMapping = {
-            "2": "练气",
-            "3": "筑基",
-            "4": "结丹",
-            "5": "元婴",
-            "6": "化神",
-            "7": "返虚",
-            "8": "合体",
-            "9": "大乘",
-            "10": "渡劫",
-            "11": "真仙",
-            "12": "金仙",
-            "13": "太乙",
-            "14": "大罗",
-            "default": "未知境界"
+        // 在原有JavaScript部分添加职业对应的境界映射表
+        const levelMappingByJob = {
+            // 体修(金相)境界
+            "ti": {
+                "2": "通脉",
+                "3": "锻骨",
+                "4": "炼腑",
+                "5": "元武",
+                "6": "神力",
+                "7": "破虚",
+                "8": "混元",
+                "9": "大成",
+                "10": "涅槃",
+                "11": "真武",
+                "12": "金相",
+                "13": "太上",
+                "14": "罗天"
+            },
+            // 法修(金仙)境界
+            "fa": {
+                "2": "练气",
+                "3": "筑基",
+                "4": "结丹",
+                "5": "元婴",
+                "6": "化神",
+                "7": "返虚",
+                "8": "合体",
+                "9": "大乘",
+                "10": "渡劫",
+                "11": "真仙",
+                "12": "金仙",
+                "13": "太乙",
+                "14": "大罗"
+            },
+            // 剑修境界
+            "jian": {
+                "2": "驭剑",
+                "3": "塑灵",
+                "4": "炼意",
+                "5": "元罡",
+                "6": "通明",
+                "7": "碎虚",
+                "8": "归元",
+                "9": "剑成",
+                "10": "开天",
+                "11": "剑仙",
+                "12": "万相",
+                "13": "太一",
+                "14": "无极"
+            },
+            // 鬼修境界
+            "gui": {
+                "2": "聚魂",
+                "3": "凝魄",
+                "4": "鬼丹",
+                "5": "元冥",
+                "6": "通幽",
+                "7": "归虚",
+                "8": "合冥",
+                "9": "煞成",
+                "10": "阳劫",
+                "11": "鬼仙",
+                "12": "金魄",
+                "13": "太阴",
+                "14": "阎罗"
+            },
+            // 儒修境界
+            "ru": {
+                "2": "开窍",
+                "3": "凝识",
+                "4": "文胆",
+                "5": "才心",
+                "6": "明神",
+                "7": "致虚",
+                "8": "合德",
+                "9": "文成",
+                "10": "立命",
+                "11": "儒仙",
+                "12": "玉璞",
+                "13": "太和",
+                "14": "圣贤"
+            },
+            // 默认境界（未知职业）
+            "default": {
+                "2": "练气",
+                "3": "筑基",
+                "4": "结丹",
+                "5": "元婴",
+                "6": "化神",
+                "7": "返虚",
+                "8": "合体",
+                "9": "大乘",
+                "10": "渡劫",
+                "11": "真仙",
+                "12": "金仙",
+                "13": "太乙",
+                "14": "大罗"
+            }
         };
 
         // 恢复默认参数
@@ -639,8 +722,12 @@
                         let jobClass = jobInfo.className;
                         let jobText = jobInfo.name;
 
-                        // 替换原来的等级(境界)处理代码
-                        let levelText = faLevelMapping[player.level] || levelMapping.default;
+                        // 替换原来的境界处理代码
+                        // 获取该职业对应的境界映射表
+                        const jobType = player.job || "default";
+                        const jobLevels = levelMappingByJob[jobType] || levelMappingByJob["default"];
+                        // 获取境界名称，如果找不到则显示等级数值
+                        const levelText = jobLevels[player.level] || `等级${player.level}`;
 
                         // 标签处理
                         let labelsHtml = "";
@@ -664,7 +751,7 @@
                             <div class="player-stats">
                                 <div class="stat-item">
                                     <span class="stat-label">职业</span>
-                                    <span class="stat-value">${player.job || "0"}</span>
+                                    <span class="stat-value">${jobText}</span>
                                 </div>
                                 <!-- 替换等级显示部分 -->
                                 <div class="stat-item">
