@@ -5,39 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>工具网站 - 玩家数据查询</title>
     <style>
+        /* 保持原有样式不变 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft YaHei", "SimSun", sans-serif; /* 偏古风字体 */
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
         }
 
         body {
-            background-color: #f5f0e5; /* 游戏风格米黄背景 */
+            background-color: #f5f0e5;
             padding: 20px;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* 标题样式 */
         .site-title {
             font-size: 2.2rem;
-            color: #8b5a2b; /* 棕色调标题 */
+            color: #8b5a2b;
             text-align: center;
             margin: 20px 0 30px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* 搜索筛选区（对应排行榜的筛选栏） */
         .search-filter {
-            background-color: #fff8f0; /* 浅米黄卡片 */
+            background-color: #fff8f0;
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* 轻微阴影 */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .input-group {
@@ -47,24 +46,44 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: #6d4c41; /* 深棕文字 */
+            color: #6d4c41;
             font-weight: 500;
         }
 
-        #apiUrl {
+        #apiBaseUrl {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #e0d0b5; /* 浅棕边框 */
+            border: 1px solid #e0d0b5;
             border-radius: 4px;
             font-size: 1rem;
             background-color: #fff;
             color: #3e2723;
         }
 
+        .param-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .param-item {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .param-item input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0d0b5;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
         .btn-group {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap; /* 移动端换行 */
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -77,7 +96,7 @@
         }
 
         .fetch-btn {
-            background-color: #d79e5b; /* 游戏风橙色按钮 */
+            background-color: #d79e5b;
             color: #fff;
         }
 
@@ -87,7 +106,7 @@
         }
 
         .reset-btn {
-            background-color: #8d6e63; /* 深棕按钮 */
+            background-color: #8d6e63;
             color: #fff;
         }
 
@@ -102,12 +121,11 @@
             line-height: 1.5;
         }
 
-        /* 结果展示区（对应排行榜列表） */
         .result-section {
-            background-color: #fff; /* 白色卡片 */
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            overflow: hidden; /* 裁剪圆角 */
+            overflow: hidden;
         }
 
         .result-header {
@@ -128,7 +146,7 @@
         .status {
             font-size: 0.9rem;
             padding: 4px 10px;
-            border-radius: 20px; /* 圆角标签 */
+            border-radius: 20px;
         }
 
         .status-loading {
@@ -146,92 +164,124 @@
             color: #c62828;
         }
 
-        /* 玩家列表样式（模仿排行榜条目） */
-        .player-list {
-            list-style: none;
+        /* 方块式布局样式 */
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
         }
 
-        .player-item {
+        .player-card {
+            background-color: #fff8f0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 排名标识 */
+        .rank-badge {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: white;
             display: flex;
-            align-items: flex-start;
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0e0c5;
-            transition: background-color 0.2s;
-        }
-
-        .player-item:hover {
-            background-color: #faf5ee; /* hover时浅底色 */
-        }
-
-        .player-item:last-child {
-            border-bottom: none;
-        }
-
-        /* 排名样式（1-3名特殊颜色） */
-        .rank-number {
-            font-size: 1.5rem;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            min-width: 30px;
-            text-align: center;
-            margin-right: 15px;
-            padding-top: 2px;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .rank-1 { color: #e67e22; } /* 第1名橙色 */
-        .rank-2 { color: #3498db; } /* 第2名蓝色 */
-        .rank-3 { color: #8e44ad; } /* 第3名紫色 */
-        .rank-other { color: #3e2723; } /* 其他名深棕 */
+        .rank-1 { background-color: #e67e22; }
+        .rank-2 { background-color: #3498db; }
+        .rank-3 { background-color: #8e44ad; }
+        .rank-other { background-color: #8d6e63; }
 
-        .player-info {
-            flex: 1; /* 占满剩余空间 */
+        .player-header {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-align: center;
         }
 
         .player-name {
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 1.2rem;
+            font-weight: bold;
             color: #3e2723;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
-        .player-tag {
+        .job-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .job-gui { background-color: #9b59b6; } /* 鬼 */
+        .job-jian { background-color: #f39c12; } /* 剑 */
+        .job-other { background-color: #42a5f5; } /* 其他 */
+
+        .player-stats {
+            background-color: white;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #f0e0c5;
+            font-size: 0.9rem;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #795548;
+        }
+
+        .stat-value {
+            color: #c62828;
+            font-weight: 500;
+        }
+
+        .labels-container {
+            margin-top: 10px;
+        }
+
+        .label-item {
             display: inline-block;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.8rem;
-            color: #fff;
-            margin-left: 8px;
-        }
-
-        .tag-sun { background-color: #9b59b6; } /* 太阴标签 */
-        .tag-taiyi { background-color: #f39c12; } /* 太一标签 */
-        .tag-other { background-color: #42a5f5; } /* 其他职业标签 */
-
-        .player-stats {
-            color: #c62828; /* 战力/关键数据红色 */
-            font-weight: 500;
+            margin-right: 5px;
             margin-bottom: 5px;
-        }
-
-        .player-detail {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #795548; /* 辅助信息深棕 */
-            font-size: 0.9rem;
-        }
-
-        .server-clan {
-            text-align: right;
+            color: white;
         }
 
         .update-time {
-            color: #a1887f; /* 时间浅棕 */
             font-size: 0.8rem;
-            margin-left: 20px;
-            white-space: nowrap; /* 不换行 */
+            color: #a1887f;
+            text-align: right;
+            margin-top: 10px;
         }
 
-        /* 空状态/错误状态样式 */
         .empty, .error-message {
             padding: 30px 20px;
             text-align: center;
@@ -248,7 +298,6 @@
             line-height: 1.6;
         }
 
-        /* 原始数据展示样式 */
         pre {
             padding: 15px;
             background-color: #fff8f0;
@@ -259,26 +308,26 @@
             line-height: 1.5;
         }
 
-        /* 移动端适配 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background-color: #fff8f0;
+        }
+
+        .pagination-btn {
+            padding: 5px 12px;
+        }
+
         @media (max-width: 600px) {
             .site-title {
                 font-size: 1.8rem;
             }
 
-            .player-detail {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
-            .server-clan {
-                text-align: left;
-                margin-top: 5px;
-            }
-
-            .update-time {
-                margin-left: 0;
-                margin-top: 5px;
+            .player-grid {
+                grid-template-columns: 1fr;
             }
 
             .btn-group {
@@ -293,70 +342,134 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="site-title">工具网站</h1>
+    <h1 class="site-title">逍遥战力榜</h1>
 
-    <!-- 搜索筛选区（对应游戏排行榜的筛选栏） -->
     <div class="search-filter">
         <div class="input-group">
-            <label for="apiUrl">接口地址（可修改）</label>
+            <label for="apiBaseUrl">接口基础地址</label>
             <input
                     type="text"
-                    id="apiUrl"
-                    value="https://www.swallaws.com/xian/box/api/player/find?sort=0&page=1&size=10"
-                    placeholder="输入玩家数据接口地址"
+                    id="apiBaseUrl"
+                    value="https://www.swallaws.com/xian/box/api/player/find"
+                    placeholder="输入玩家数据接口基础地址"
             >
-            <div class="hint">
-                1. 默认加载玩家排行榜接口，支持手动修改<br>
-                2. 跨域错误？尝试添加代理前缀：https://cors-anywhere.herokuapp.com/
+        </div>
+
+        <div class="param-group">
+            <div class="param-item">
+                <label for="sort">排序方式 (0:降序,1:升序)</label>
+                <input type="number" id="sort" value="0" min="0">
+            </div>
+            <div class="param-item">
+                <label for="page">页码</label>
+                <input type="number" id="page" value="1" min="1">
+            </div>
+            <div class="param-item">
+                <label for="size">每页条数</label>
+                <input type="number" id="size" value="10" min="1" max="100">
             </div>
         </div>
 
         <div class="btn-group">
             <button class="btn fetch-btn" onclick="fetchApiData()">获取玩家数据</button>
-            <button class="btn reset-btn" onclick="resetApiUrl()">恢复默认接口</button>
+            <button class="btn reset-btn" onclick="resetApiParams()">恢复默认参数</button>
+        </div>
+
+        <div class="hint">
+            1. 接口参数将自动拼接在基础地址后<br>
+            2. 跨域错误？尝试添加代理前缀：https://cors-anywhere.herokuapp.com/
         </div>
     </div>
 
-    <!-- 结果展示区（模仿排行榜列表样式） -->
     <div class="result-section">
         <div class="result-header">
             <div class="result-title">玩家排行榜数据</div>
             <div class="status" id="status">未请求</div>
         </div>
         <div id="resultArea" class="empty">点击"获取玩家数据"按钮加载排行榜</div>
+        <div id="pagination" class="pagination" style="display: none;">
+            <button class="btn pagination-btn" onclick="changePage(-1)">上一页</button>
+            <span id="pageInfo">第 1 页</span>
+            <button class="btn pagination-btn" onclick="changePage(1)">下一页</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // 默认接口地址
-    const DEFAULT_API_URL = "https://www.swallaws.com/xian/box/api/player/find?sort=0&page=1&size=10";
+    const DEFAULT_API_BASE_URL = "https://www.swallaws.com/xian/box/api/player/find";
+    const DEFAULT_SORT = 0;
+    const DEFAULT_PAGE = 1;
+    const DEFAULT_SIZE = 10;
 
-    // 恢复默认接口
-    function resetApiUrl() {
-        document.getElementById("apiUrl").value = DEFAULT_API_URL;
+    // 恢复默认参数
+    function resetApiParams() {
+        document.getElementById("apiBaseUrl").value = DEFAULT_API_BASE_URL;
+        document.getElementById("sort").value = DEFAULT_SORT;
+        document.getElementById("page").value = DEFAULT_PAGE;
+        document.getElementById("size").value = DEFAULT_SIZE;
     }
 
-    // 发起请求并展示玩家数据（按排行榜样式渲染）
+    // 切换页码
+    function changePage(direction) {
+        const pageInput = document.getElementById("page");
+        let currentPage = parseInt(pageInput.value, 10) || 1;
+        const newPage = currentPage + direction;
+
+        if (newPage >= 1) {
+            pageInput.value = newPage;
+            fetchApiData();
+        }
+    }
+
+    // 构建完整API地址
+    function buildApiUrl() {
+        const baseUrl = document.getElementById("apiBaseUrl").value.trim();
+        const sort = document.getElementById("sort").value.trim();
+        const page = document.getElementById("page").value.trim();
+        const size = document.getElementById("size").value.trim();
+
+        // 验证必要参数
+        if (!baseUrl) return null;
+        if (!sort || isNaN(sort)) return null;
+        if (!page || isNaN(page) || parseInt(page) < 1) return null;
+        if (!size || isNaN(size) || parseInt(size) < 1) return null;
+
+        // 构建查询参数
+        const params = new URLSearchParams();
+        params.append('sort', sort);
+        params.append('page', page);
+        params.append('size', size);
+
+        // 拼接基础URL和参数
+        return baseUrl.includes('?')
+            ? `${baseUrl}&${params.toString()}`
+            : `${baseUrl}?${params.toString()}`;
+    }
+
     async function fetchApiData() {
-        const apiUrl = document.getElementById("apiUrl").value.trim();
+        const apiUrl = buildApiUrl();
         const resultArea = document.getElementById("resultArea");
         const statusElement = document.getElementById("status");
+        const pagination = document.getElementById("pagination");
+        const pageInfo = document.getElementById("pageInfo");
+        const currentPage = document.getElementById("page").value;
 
-        // 输入验证
+        // 验证API地址
         if (!apiUrl) {
             statusElement.className = "status status-error";
             statusElement.textContent = "输入错误";
-            resultArea.innerHTML = '<div class="error-message">请输入有效的接口地址</div>';
+            resultArea.innerHTML = '<div class="error-message">请输入有效的接口参数</div>';
+            pagination.style.display = "none";
             return;
         }
 
-        // 加载状态
+        // 显示加载状态
         statusElement.className = "status status-loading";
         statusElement.textContent = "加载中...";
         resultArea.innerHTML = '<div class="empty">正在获取玩家数据，请稍候...</div>';
+        pagination.style.display = "none";
 
         try {
-            // 发起请求
             const response = await fetch(apiUrl);
             if (!response.ok) {
                 throw new Error(`请求失败（状态码：${response.status}）`);
@@ -364,96 +477,111 @@
             const data = await response.json();
             console.log("接口返回数据：", data);
 
-            // 成功状态
             statusElement.className = "status status-success";
             statusElement.textContent = "加载成功";
 
-            // 解析并渲染玩家列表（适配常见的排行榜数据结构）
-            // 假设数据结构：{code:200, data:{list:[{id,name,level,power,server,clan,profession,updateTime},...], total}}
-            if (data.code === 200 && data.data?.list && data.data.list.length > 0) {
-                const players = data.data.list;
-                let html = '<ul class="player-list">';
+            // 适配数据格式
+            if (data.code === 200 && data.data && data.data.length > 0) {
+                const players = data.data;
+                let html = '<div class="player-grid">';
 
-                players.forEach((player, index) => {
-                    // 排名样式（1-3名特殊颜色）
-                    const rank = index + 1;
+                players.forEach(player => {
+                    // 排名样式
+                    const rank = player.rank || 0;
                     let rankClass = "rank-other";
                     if (rank === 1) rankClass = "rank-1";
                     else if (rank === 2) rankClass = "rank-2";
                     else if (rank === 3) rankClass = "rank-3";
 
-                    // 职业标签样式（根据职业动态匹配）
-                    let tagClass = "tag-other";
-                    let tagText = "未知";
-                    if (player.profession === "太阴") {
-                        tagClass = "tag-sun";
-                        tagText = "太阴";
-                    } else if (player.profession === "太一") {
-                        tagClass = "tag-taiyi";
-                        tagText = "太一";
-                    } else if (player.profession) {
-                        tagText = player.profession;
+                    // 职业处理
+                    let jobClass = "job-other";
+                    let jobText = "未知";
+                    if (player.job === "gui") {
+                        jobClass = "job-gui";
+                        jobText = "太阴";
+                    } else if (player.job === "jian") {
+                        jobClass = "job-jian";
+                        jobText = "太一";
+                    } else if (player.job) {
+                        jobText = player.job;
                     }
 
-                    // 拼接玩家条目HTML
-                    html += `
-                            <li class="player-item">
-                                <div class="rank-number ${rankClass}">${rank}</div>
-                                <div class="player-info">
-                                    <div class="player-name">
-                                        ${player.name || "无名玩家"}
-                                        <span class="player-tag ${tagClass}">${tagText}</span>
-                                    </div>
-                                    <div class="player-stats">战力：${player.power || "0"}</div>
-                                    <div class="player-detail">
-                                        <div>等级：${player.level || "0"}</div>
-                                        <div class="server-clan">
-                                            区服：${player.server || "未知"}<br>
-                                            宗门：${player.clan || "无"}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="update-time">${player.updateTime || "刚刚"}</div>
-                            </li>
-                        `;
-                });
+                    // 标签处理
+                    let labelsHtml = "";
+                    if (player.labels && player.labels.length > 0) {
+                        player.labels.forEach(label => {
+                            labelsHtml += `<span class="label-item" style="background-color: rgb(${label.color})">${label.name}</span>`;
+                        });
+                    }
 
-                html += '</ul>';
-                // 添加分页信息
-                if (data.data.total) {
+                    // 战力格式化
+                    const formattedCombat = player.combat.toLocaleString();
+
+                    // 卡片HTML
                     html += `
-                            <div style="padding:15px; text-align:center; color:#8d6e63; font-size:0.9rem;">
-                                共 ${data.data.total} 名玩家 · 当前第 ${data.data.page || 1} 页
+                        <div class="player-card">
+                            <div class="rank-badge ${rankClass}">${rank}</div>
+                            <div class="player-header">
+                                <div class="player-name">${player.name || "无名玩家"}</div>
+                                <span class="job-tag ${jobClass}">${jobText}</span>
                             </div>
-                        `;
-                }
-                resultArea.innerHTML = html;
-
-            } else {
-                // 数据结构不匹配时展示原始数据
-                resultArea.innerHTML = `
-                        <div style="padding:15px; color:#8d6e63;">
-                            数据格式未匹配，展示原始数据：
-                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                            <div class="player-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">等级</span>
+                                    <span class="stat-value">${player.level || "0"}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">战力</span>
+                                    <span class="stat-value">${formattedCombat}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">区服</span>
+                                    <span class="stat-value">${player.serverName || "未知"}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">宗门</span>
+                                    <span class="stat-value">${player.gangName || "无"}</span>
+                                </div>
+                            </div>
+                            <div class="labels-container">
+                                ${labelsHtml}
+                            </div>
+                            <div class="update-time">${player.updateTime || "刚刚更新"}</div>
                         </div>
                     `;
+                });
+
+                html += '</div>';
+                resultArea.innerHTML = html;
+                // 显示分页控件
+                pagination.style.display = "flex";
+                pageInfo.textContent = `第 ${currentPage} 页`;
+
+            } else {
+                resultArea.innerHTML = `
+                    <div style="padding:15px; color:#8d6e63;">
+                        数据格式未匹配，展示原始数据：
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+                pagination.style.display = "none";
             }
 
         } catch (error) {
-            // 错误处理
             statusElement.className = "status status-error";
             statusElement.textContent = "加载失败";
 
             let errorMsg = error.message;
             if (errorMsg.includes("CORS")) {
                 errorMsg += `
-                        <br><br>跨域解决方案：
-                        1. 在接口前添加代理：<br>
-                        https://cors-anywhere.herokuapp.com/${apiUrl}
-                        <br><br>2. 安装浏览器跨域插件（如Allow CORS）
-                    `;
+                    <br><br>跨域解决方案：
+                    1. 在接口前添加代理：<br>
+                    https://cors-anywhere.herokuapp.com/${apiUrl}
+                    <br><br>2. 安装浏览器跨域插件（如Allow CORS）
+                `;
             }
             resultArea.innerHTML = `<div class="error-message">${errorMsg}</div>`;
+            pagination.style.display = "none";
             console.error("错误详情：", error);
         }
     }
