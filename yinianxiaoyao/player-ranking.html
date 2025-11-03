@@ -28,7 +28,7 @@
             color: #8b5a2b;
             text-align: center;
             margin: 20px 0 30px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .search-filter {
@@ -36,7 +36,7 @@
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .input-group {
@@ -134,7 +134,7 @@
         .result-section {
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             overflow: hidden;
         }
 
@@ -186,14 +186,14 @@
             background-color: #fff8f0;
             border-radius: 8px;
             padding: 15px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
             position: relative;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .player-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         /* 修改排名标识样式 */
@@ -209,16 +209,27 @@
             justify-content: center;
             font-weight: bold;
             font-size: 0.9rem; /* 稍微缩小字体 */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             min-width: 28px; /* 确保小数字时有基本宽度 */
             height: 28px; /* 固定高度保持一致性 */
         }
 
         /* 保持原有的排名颜色样式 */
-        .rank-1 { background-color: #e67e22; }
-        .rank-2 { background-color: #3498db; }
-        .rank-3 { background-color: #8e44ad; }
-        .rank-other { background-color: #8d6e63; }
+        .rank-1 {
+            background-color: #e67e22;
+        }
+
+        .rank-2 {
+            background-color: #3498db;
+        }
+
+        .rank-3 {
+            background-color: #8e44ad;
+        }
+
+        .rank-other {
+            background-color: #8d6e63;
+        }
 
         .player-header {
             margin-top: 10px;
@@ -241,9 +252,21 @@
             color: white;
         }
 
-        .job-gui { background-color: #9b59b6; } /* 鬼 */
-        .job-jian { background-color: #f39c12; } /* 剑 */
-        .job-other { background-color: #42a5f5; } /* 其他 */
+        .job-gui {
+            background-color: #9b59b6;
+        }
+
+        /* 鬼 */
+        .job-jian {
+            background-color: #f39c12;
+        }
+
+        /* 剑 */
+        .job-other {
+            background-color: #42a5f5;
+        }
+
+        /* 其他 */
 
         .player-stats {
             background-color: white;
@@ -333,6 +356,38 @@
             padding: 5px 12px;
         }
 
+        /* 在样式部分添加各职业的颜色 */
+        .job-fa {
+            background-color: #42a5f5;
+        }
+
+        /* 法修 - 蓝色 */
+        .job-ti {
+            background-color: #66bb6a;
+        }
+
+        /* 体修 - 绿色 */
+        .job-jian {
+            background-color: #f39c12;
+        }
+
+        /* 剑修 - 橙色 */
+        .job-gui {
+            background-color: #9b59b6;
+        }
+
+        /* 鬼修 - 紫色 */
+        .job-ru {
+            background-color: #ec407a;
+        }
+
+        /* 儒修 - 粉色 */
+        .job-other {
+            background-color: #78909c;
+        }
+
+        /* 其他 - 灰色 */
+
         @media (max-width: 600px) {
             .site-title {
                 font-size: 1.8rem;
@@ -417,169 +472,189 @@
                 </select>
             </div>
 
-        <div class="btn-group">
-            <button class="btn fetch-btn" onclick="fetchApiData()">获取玩家数据</button>
-            <button class="btn reset-btn" onclick="resetApiParams()">恢复默认参数</button>
+            <div class="btn-group">
+                <button class="btn fetch-btn" onclick="fetchApiData()">获取玩家数据</button>
+                <button class="btn reset-btn" onclick="resetApiParams()">恢复默认参数</button>
+            </div>
+
+            <div class="hint">
+                1. 接口参数将自动拼接在基础地址后<br>
+                2. 跨域错误？尝试添加代理前缀：https://cors-anywhere.herokuapp.com/
+            </div>
         </div>
 
-        <div class="hint">
-            1. 接口参数将自动拼接在基础地址后<br>
-            2. 跨域错误？尝试添加代理前缀：https://cors-anywhere.herokuapp.com/
+        <div class="result-section">
+            <div class="result-header">
+                <div class="result-title">玩家排行榜数据</div>
+                <div class="status" id="status">未请求</div>
+            </div>
+            <div id="resultArea" class="empty">点击"获取玩家数据"按钮加载排行榜</div>
+            <div id="pagination" class="pagination" style="display: none;">
+                <button class="btn pagination-btn" onclick="changePage(-1)">上一页</button>
+                <span id="pageInfo">第 1 页</span>
+                <button class="btn pagination-btn" onclick="changePage(1)">下一页</button>
+            </div>
         </div>
     </div>
 
-    <div class="result-section">
-        <div class="result-header">
-            <div class="result-title">玩家排行榜数据</div>
-            <div class="status" id="status">未请求</div>
-        </div>
-        <div id="resultArea" class="empty">点击"获取玩家数据"按钮加载排行榜</div>
-        <div id="pagination" class="pagination" style="display: none;">
-            <button class="btn pagination-btn" onclick="changePage(-1)">上一页</button>
-            <span id="pageInfo">第 1 页</span>
-            <button class="btn pagination-btn" onclick="changePage(1)">下一页</button>
-        </div>
-    </div>
-</div>
+    <script>
+        const DEFAULT_API_BASE_URL = "https://www.swallaws.com/xian/box/api/player/find";
+        const DEFAULT_SORT = 0;
+        const DEFAULT_PAGE = 1;
+        const DEFAULT_SIZE = 10;
+        // 在JavaScript部分添加职业映射关系
+        const jobMapping = {
+            "fa": {className: "job-fa", name: "法修"},
+            "ti": {className: "job-ti", name: "体修"},
+            "jian": {className: "job-jian", name: "剑修"},
+            "gui": {className: "job-gui", name: "鬼修"},
+            "ru": {className: "job-ru", name: "儒修"},
+            "default": {className: "job-other", name: "未知职业"}
+        };
+        // 在JavaScript部分添加境界映射关系
+        const faLevelMapping = {
+            "2": "练气",
+            "3": "筑基",
+            "4": "结丹",
+            "5": "元婴",
+            "6": "化神",
+            "7": "返虚",
+            "8": "合体",
+            "9": "大乘",
+            "10": "渡劫",
+            "11": "真仙",
+            "12": "金仙",
+            "13": "太乙",
+            "14": "大罗",
+            "default": "未知境界"
+        };
 
-<script>
-    const DEFAULT_API_BASE_URL = "https://www.swallaws.com/xian/box/api/player/find";
-    const DEFAULT_SORT = 0;
-    const DEFAULT_PAGE = 1;
-    const DEFAULT_SIZE = 10;
-
-    // 恢复默认参数
-    function resetApiParams() {
-        document.getElementById("apiBaseUrl").value = DEFAULT_API_BASE_URL;
-        document.getElementById("sort").value = DEFAULT_SORT;
-        document.getElementById("page").value = DEFAULT_PAGE;
-        document.getElementById("size").value = DEFAULT_SIZE;
-        // 重置新添加的字段
-        document.getElementById("name").value = "";
-        document.getElementById("level").value = "";
-        document.getElementById("job").value = "";
-    }
-
-    // 切换页码
-    function changePage(direction) {
-        const pageInput = document.getElementById("page");
-        let currentPage = parseInt(pageInput.value, 10) || 1;
-        const newPage = currentPage + direction;
-
-        if (newPage >= 1) {
-            pageInput.value = newPage;
-            fetchApiData();
-        }
-    }
-
-    // 构建完整API地址
-    function buildApiUrl() {
-        const baseUrl = document.getElementById("apiBaseUrl").value.trim();
-        const sort = document.getElementById("sort").value.trim();
-        const page = document.getElementById("page").value.trim();
-        const size = document.getElementById("size").value.trim();
-        // 获取新添加的参数
-        const name = document.getElementById("name").value.trim();
-        const level = document.getElementById("level").value.trim();
-        const job = document.getElementById("job").value.trim();
-
-        // 验证必要参数
-        if (!baseUrl) return null;
-        if (!sort || isNaN(sort)) return null;
-        if (!page || isNaN(page) || parseInt(page) < 1) return null;
-        if (!size || isNaN(size) || parseInt(size) < 1) return null;
-
-        // 构建查询参数
-        const params = new URLSearchParams();
-        params.append('sort', sort);
-        params.append('page', page);
-        params.append('size', size);
-
-        // 添加新参数（只在有值时添加）
-        if (name) params.append('name', name);
-        if (level) params.append('level', level);
-        if (job) params.append('job', job);
-
-        // 拼接基础URL和参数
-        return baseUrl.includes('?')
-            ? `${baseUrl}&${params.toString()}`
-            : `${baseUrl}?${params.toString()}`;
-    }
-
-    async function fetchApiData() {
-        const apiUrl = buildApiUrl();
-        const resultArea = document.getElementById("resultArea");
-        const statusElement = document.getElementById("status");
-        const pagination = document.getElementById("pagination");
-        const pageInfo = document.getElementById("pageInfo");
-        const currentPage = document.getElementById("page").value;
-
-        // 验证API地址
-        if (!apiUrl) {
-            statusElement.className = "status status-error";
-            statusElement.textContent = "输入错误";
-            resultArea.innerHTML = '<div class="error-message">请输入有效的接口参数</div>';
-            pagination.style.display = "none";
-            return;
+        // 恢复默认参数
+        function resetApiParams() {
+            document.getElementById("apiBaseUrl").value = DEFAULT_API_BASE_URL;
+            document.getElementById("sort").value = DEFAULT_SORT;
+            document.getElementById("page").value = DEFAULT_PAGE;
+            document.getElementById("size").value = DEFAULT_SIZE;
+            // 重置新添加的字段
+            document.getElementById("name").value = "";
+            document.getElementById("level").value = "";
+            document.getElementById("job").value = "";
         }
 
-        // 显示加载状态
-        statusElement.className = "status status-loading";
-        statusElement.textContent = "加载中...";
-        resultArea.innerHTML = '<div class="empty">正在获取玩家数据，请稍候...</div>';
-        pagination.style.display = "none";
+        // 切换页码
+        function changePage(direction) {
+            const pageInput = document.getElementById("page");
+            let currentPage = parseInt(pageInput.value, 10) || 1;
+            const newPage = currentPage + direction;
 
-        try {
-            const response = await fetch(apiUrl);
-            if (!response.ok) {
-                throw new Error(`请求失败（状态码：${response.status}）`);
+            if (newPage >= 1) {
+                pageInput.value = newPage;
+                fetchApiData();
             }
-            const data = await response.json();
-            console.log("接口返回数据：", data);
+        }
 
-            statusElement.className = "status status-success";
-            statusElement.textContent = "加载成功";
+        // 构建完整API地址
+        function buildApiUrl() {
+            const baseUrl = document.getElementById("apiBaseUrl").value.trim();
+            const sort = document.getElementById("sort").value.trim();
+            const page = document.getElementById("page").value.trim();
+            const size = document.getElementById("size").value.trim();
+            // 获取新添加的参数
+            const name = document.getElementById("name").value.trim();
+            const level = document.getElementById("level").value.trim();
+            const job = document.getElementById("job").value.trim();
 
-            // 适配数据格式
-            if (data.code === 200 && data.data && data.data.length > 0) {
-                const players = data.data;
-                let html = '<div class="player-grid">';
+            // 验证必要参数
+            if (!baseUrl) return null;
+            if (!sort || isNaN(sort)) return null;
+            if (!page || isNaN(page) || parseInt(page) < 1) return null;
+            if (!size || isNaN(size) || parseInt(size) < 1) return null;
 
-                players.forEach(player => {
-                    // 排名样式
-                    const rank = player.rank || 0;
-                    let rankClass = "rank-other";
-                    if (rank === 1) rankClass = "rank-1";
-                    else if (rank === 2) rankClass = "rank-2";
-                    else if (rank === 3) rankClass = "rank-3";
+            // 构建查询参数
+            const params = new URLSearchParams();
+            params.append('sort', sort);
+            params.append('page', page);
+            params.append('size', size);
 
-                    // 职业处理
-                    let jobClass = "job-other";
-                    let jobText = "未知";
-                    if (player.job === "gui") {
-                        jobClass = "job-gui";
-                        jobText = "太阴";
-                    } else if (player.job === "jian") {
-                        jobClass = "job-jian";
-                        jobText = "太一";
-                    } else if (player.job) {
-                        jobText = player.job;
-                    }
+            // 添加新参数（只在有值时添加）
+            if (name) params.append('name', name);
+            if (level) params.append('level', level);
+            if (job) params.append('job', job);
 
-                    // 标签处理
-                    let labelsHtml = "";
-                    if (player.labels && player.labels.length > 0) {
-                        player.labels.forEach(label => {
-                            labelsHtml += `<span class="label-item" style="background-color: rgb(${label.color})">${label.name}</span>`;
-                        });
-                    }
+            // 拼接基础URL和参数
+            return baseUrl.includes('?')
+                ? `${baseUrl}&${params.toString()}`
+                : `${baseUrl}?${params.toString()}`;
+        }
 
-                    // 替换原来的战力格式化代码
-                    const formattedCombat = formatNumberWithUnits(player.combat);
-                    const formattedJon = formatNumberWithUnits(player.job);
+        async function fetchApiData() {
+            const apiUrl = buildApiUrl();
+            const resultArea = document.getElementById("resultArea");
+            const statusElement = document.getElementById("status");
+            const pagination = document.getElementById("pagination");
+            const pageInfo = document.getElementById("pageInfo");
+            const currentPage = document.getElementById("page").value;
 
-                    // 卡片HTML
-                    html += `
+            // 验证API地址
+            if (!apiUrl) {
+                statusElement.className = "status status-error";
+                statusElement.textContent = "输入错误";
+                resultArea.innerHTML = '<div class="error-message">请输入有效的接口参数</div>';
+                pagination.style.display = "none";
+                return;
+            }
+
+            // 显示加载状态
+            statusElement.className = "status status-loading";
+            statusElement.textContent = "加载中...";
+            resultArea.innerHTML = '<div class="empty">正在获取玩家数据，请稍候...</div>';
+            pagination.style.display = "none";
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`请求失败（状态码：${response.status}）`);
+                }
+                const data = await response.json();
+                console.log("接口返回数据：", data);
+
+                statusElement.className = "status status-success";
+                statusElement.textContent = "加载成功";
+
+                // 适配数据格式
+                if (data.code === 200 && data.data && data.data.length > 0) {
+                    const players = data.data;
+                    let html = '<div class="player-grid">';
+
+                    players.forEach(player => {
+                        // 排名样式
+                        const rank = player.rank || 0;
+                        let rankClass = "rank-other";
+                        if (rank === 1) rankClass = "rank-1";
+                        else if (rank === 2) rankClass = "rank-2";
+                        else if (rank === 3) rankClass = "rank-3";
+
+                        // 替换原来的职业处理代码
+                        let jobInfo = jobMapping[player.job] || jobMapping.default;
+                        let jobClass = jobInfo.className;
+                        let jobText = jobInfo.name;
+
+                        // 替换原来的等级(境界)处理代码
+                        let levelText = faLevelMapping[player.level] || levelMapping.default;
+
+                        // 标签处理
+                        let labelsHtml = "";
+                        if (player.labels && player.labels.length > 0) {
+                            player.labels.forEach(label => {
+                                labelsHtml += `<span class="label-item" style="background-color: rgb(${label.color})">${label.name}</span>`;
+                            });
+                        }
+
+                        // 替换原来的战力格式化代码
+                        const formattedCombat = formatNumberWithUnits(player.combat);
+
+                        // 卡片HTML
+                        html += `
                         <div class="player-card">
                             <div class="rank-badge ${rankClass}">${rank}</div>
                             <div class="player-header">
@@ -588,12 +663,13 @@
                             </div>
                             <div class="player-stats">
                                 <div class="stat-item">
-                                    <span class="stat-label">等级</span>
+                                    <span class="stat-label">职业</span>
                                     <span class="stat-value">${player.job || "0"}</span>
                                 </div>
+                                <!-- 替换等级显示部分 -->
                                 <div class="stat-item">
-                                    <span class="stat-label">等级</span>
-                                    <span class="stat-value">${player.level || "0"}</span>
+                                    <span class="stat-label">境界</span>
+                                    <span class="stat-value">${levelText}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">战力</span>
@@ -614,78 +690,78 @@
                             <div class="update-time">${player.updateTime || "刚刚更新"}</div>
                         </div>
                     `;
-                });
+                    });
 
-                html += '</div>';
-                resultArea.innerHTML = html;
-                // 显示分页控件
-                pagination.style.display = "flex";
-                pageInfo.textContent = `第 ${currentPage} 页`;
+                    html += '</div>';
+                    resultArea.innerHTML = html;
+                    // 显示分页控件
+                    pagination.style.display = "flex";
+                    pageInfo.textContent = `第 ${currentPage} 页`;
 
-            } else {
-                resultArea.innerHTML = `
+                } else {
+                    resultArea.innerHTML = `
                     <div style="padding:15px; color:#8d6e63;">
                         数据格式未匹配，展示原始数据：
                         <pre>${JSON.stringify(data, null, 2)}</pre>
                     </div>
                 `;
-                pagination.style.display = "none";
-            }
+                    pagination.style.display = "none";
+                }
 
-        } catch (error) {
-            statusElement.className = "status status-error";
-            statusElement.textContent = "加载失败";
+            } catch (error) {
+                statusElement.className = "status status-error";
+                statusElement.textContent = "加载失败";
 
-            let errorMsg = error.message;
-            if (errorMsg.includes("CORS")) {
-                errorMsg += `
+                let errorMsg = error.message;
+                if (errorMsg.includes("CORS")) {
+                    errorMsg += `
                     <br><br>跨域解决方案：
                     1. 在接口前添加代理：<br>
                     https://cors-anywhere.herokuapp.com/${apiUrl}
                     <br><br>2. 安装浏览器跨域插件（如Allow CORS）
                 `;
+                }
+                resultArea.innerHTML = `<div class="error-message">${errorMsg}</div>`;
+                pagination.style.display = "none";
+                console.error("错误详情：", error);
             }
-            resultArea.innerHTML = `<div class="error-message">${errorMsg}</div>`;
-            pagination.style.display = "none";
-            console.error("错误详情：", error);
-        }
-    }
-
-    // 数字格式化：转换为带汉字单位的格式（万、亿、兆）
-    // 数字格式化：保留完整数值并插入单位分隔符（兆、亿、万）
-    function formatNumberWithUnits(num) {
-        // 处理非数字情况
-        if (isNaN(num) || num === null || num === undefined) return "0";
-
-        // 转换为字符串处理
-        let str = Math.floor(num).toString();
-        let result = [];
-
-        // 从右向左每4位一组处理
-        while (str.length > 0) {
-            // 最后一组可能不足4位
-            const chunk = str.length >= 4 ? str.slice(-4) : str;
-            result.unshift(chunk);
-            // 截取剩余部分
-            str = str.slice(0, str.length - 4);
         }
 
-        // 定义单位（从大到小）
-        const units = ['兆 ', '亿 ', '万 ', ''];
-        // 计算需要使用的单位起始索引
-        const unitStartIndex = units.length - result.length;
+        // 数字格式化：转换为带汉字单位的格式（万、亿、兆）
+        // 数字格式化：保留完整数值并插入单位分隔符（兆、亿、万）
+        function formatNumberWithUnits(num) {
+            // 处理非数字情况
+            if (isNaN(num) || num === null || num === undefined) return "0";
 
-        // 拼接结果
-        let formatted = '';
-        result.forEach((chunk, index) => {
-            // 只在非零 chunk 后添加单位
-            const unit = units[unitStartIndex + index];
-            formatted += chunk + (chunk !== '0000' ? unit : '');
-        });
+            // 转换为字符串处理
+            let str = Math.floor(num).toString();
+            let result = [];
 
-        // 处理特殊情况（如全零）
-        return formatted || '0';
-    }
-</script>
+            // 从右向左每4位一组处理
+            while (str.length > 0) {
+                // 最后一组可能不足4位
+                const chunk = str.length >= 4 ? str.slice(-4) : str;
+                result.unshift(chunk);
+                // 截取剩余部分
+                str = str.slice(0, str.length - 4);
+            }
+
+            // 定义单位（从大到小）
+            const units = ['兆 ', '亿 ', '万 ', ''];
+            // 计算需要使用的单位起始索引
+            const unitStartIndex = units.length - result.length;
+
+            // 拼接结果
+            let formatted = '';
+            result.forEach((chunk, index) => {
+                // 只在非零 chunk 后添加单位
+                const unit = units[unitStartIndex + index];
+                formatted += chunk + (chunk !== '0000' ? unit : '');
+            });
+
+            // 处理特殊情况（如全零）
+            return formatted || '0';
+        }
+    </script>
 </body>
 </html>
