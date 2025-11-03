@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 适配移动端 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具网站</title>
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面整体居中 */
+        body {
+            min-height: 100vh; /* 占满整个屏幕高度 */
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            background-color: #f5f5f5; /* 浅灰背景 */
+            font-family: "Microsoft YaHei", sans-serif; /* 适配中文 */
+        }
+
+        /* 标题样式 */
+        .site-title {
+            font-size: 3rem; /* 标题大小，rem单位适配不同设备 */
+            color: #333; /* 深灰文字 */
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white; /* 白色背景块 */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* 轻微阴影，增加立体感 */
+        }
+
+        /* 适配手机屏幕 */
+        @media (max-width: 600px) {
+            .site-title {
+                font-size: 2rem; /* 手机上缩小字体 */
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 核心标题 -->
+<h1 class="site-title">工具网站</h1>
+</body>
+</html>
