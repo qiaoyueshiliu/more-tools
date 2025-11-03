@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具网站 - 玩家数据查询</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "SimSun", sans-serif; /* 偏古风字体 */
+        }
+
+        body {
+            background-color: #f5f0e5; /* 游戏风格米黄背景 */
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 标题样式 */
+        .site-title {
+            font-size: 2.2rem;
+            color: #8b5a2b; /* 棕色调标题 */
+            text-align: center;
+            margin: 20px 0 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* 搜索筛选区（对应排行榜的筛选栏） */
+        .search-filter {
+            background-color: #fff8f0; /* 浅米黄卡片 */
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* 轻微阴影 */
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #6d4c41; /* 深棕文字 */
+            font-weight: 500;
+        }
+
+        #apiUrl {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0d0b5; /* 浅棕边框 */
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #fff;
+            color: #3e2723;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap; /* 移动端换行 */
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .fetch-btn {
+            background-color: #d79e5b; /* 游戏风橙色按钮 */
+            color: #fff;
+        }
+
+        .fetch-btn:hover {
+            background-color: #c88a45;
+            transform: translateY(-1px);
+        }
+
+        .reset-btn {
+            background-color: #8d6e63; /* 深棕按钮 */
+            color: #fff;
+        }
+
+        .reset-btn:hover {
+            background-color: #795548;
+        }
+
+        .hint {
+            font-size: 0.9rem;
+            color: #8d6e63;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* 结果展示区（对应排行榜列表） */
+        .result-section {
+            background-color: #fff; /* 白色卡片 */
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden; /* 裁剪圆角 */
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #fff8f0;
+            border-bottom: 1px solid #f0e0c5;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            color: #6d4c41;
+            font-weight: 500;
+        }
+
+        .status {
+            font-size: 0.9rem;
+            padding: 4px 10px;
+            border-radius: 20px; /* 圆角标签 */
+        }
+
+        .status-loading {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        /* 玩家列表样式（模仿排行榜条目） */
+        .player-list {
+            list-style: none;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0e0c5;
+            transition: background-color 0.2s;
+        }
+
+        .player-item:hover {
+            background-color: #faf5ee; /* hover时浅底色 */
+        }
+
+        .player-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 排名样式（1-3名特殊颜色） */
+        .rank-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+            margin-right: 15px;
+            padding-top: 2px;
+        }
+
+        .rank-1 { color: #e67e22; } /* 第1名橙色 */
+        .rank-2 { color: #3498db; } /* 第2名蓝色 */
+        .rank-3 { color: #8e44ad; } /* 第3名紫色 */
+        .rank-other { color: #3e2723; } /* 其他名深棕 */
+
+        .player-info {
+            flex: 1; /* 占满剩余空间 */
+        }
+
+        .player-name {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #3e2723;
+            margin-bottom: 8px;
+        }
+
+        .player-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #fff;
+            margin-left: 8px;
+        }
+
+        .tag-sun { background-color: #9b59b6; } /* 太阴标签 */
+        .tag-taiyi { background-color: #f39c12; } /* 太一标签 */
+        .tag-other { background-color: #42a5f5; } /* 其他职业标签 */
+
+        .player-stats {
+            color: #c62828; /* 战力/关键数据红色 */
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .player-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #795548; /* 辅助信息深棕 */
+            font-size: 0.9rem;
+        }
+
+        .server-clan {
+            text-align: right;
+        }
+
+        .update-time {
+            color: #a1887f; /* 时间浅棕 */
+            font-size: 0.8rem;
+            margin-left: 20px;
+            white-space: nowrap; /* 不换行 */
+        }
+
+        /* 空状态/错误状态样式 */
+        .empty, .error-message {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .empty {
+            color: #8d6e63;
+            background-color: #fff8f0;
+        }
+
+        .error-message {
+            color: #c62828;
+            background-color: #fff3f3;
+            line-height: 1.6;
+        }
+
+        /* 原始数据展示样式 */
+        pre {
+            padding: 15px;
+            background-color: #fff8f0;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            color: #3e2723;
+            line-height: 1.5;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .site-title {
+                font-size: 1.8rem;
+            }
+
+            .player-detail {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .server-clan {
+                text-align: left;
+                margin-top: 5px;
+            }
+
+            .update-time {
+                margin-left: 0;
+                margin-top: 5px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="site-title">工具网站</h1>
+
+    <!-- 搜索筛选区（对应游戏排行榜的筛选栏） -->
+    <div class="search-filter">
+        <div class="input-group">
+            <label for="apiUrl">接口地址（可修改）</label>
+            <input
+                    type="text"
+                    id="apiUrl"
+                    value="https://www.swallaws.com/xian/box/api/player/find?sort=0&page=1&size=10"
+                    placeholder="输入玩家数据接口地址"
+            >
+            <div class="hint">
+                1. 默认加载玩家排行榜接口，支持手动修改<br>
+                2. 跨域错误？尝试添加代理前缀：https://cors-anywhere.herokuapp.com/
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn fetch-btn" onclick="fetchApiData()">获取玩家数据</button>
+            <button class="btn reset-btn" onclick="resetApiUrl()">恢复默认接口</button>
+        </div>
+    </div>
+
+    <!-- 结果展示区（模仿排行榜列表样式） -->
+    <div class="result-section">
+        <div class="result-header">
+            <div class="result-title">玩家排行榜数据</div>
+            <div class="status" id="status">未请求</div>
+        </div>
+        <div id="resultArea" class="empty">点击"获取玩家数据"按钮加载排行榜</div>
+    </div>
+</div>
+
+<script>
+    // 默认接口地址
+    const DEFAULT_API_URL = "https://www.swallaws.com/xian/box/api/player/find?sort=0&page=1&size=10";
+
+    // 恢复默认接口
+    function resetApiUrl() {
+        document.getElementById("apiUrl").value = DEFAULT_API_URL;
+    }
+
+    // 发起请求并展示玩家数据（按排行榜样式渲染）
+    async function fetchApiData() {
+        const apiUrl = document.getElementById("apiUrl").value.trim();
+        const resultArea = document.getElementById("resultArea");
+        const statusElement = document.getElementById("status");
+
+        // 输入验证
+        if (!apiUrl) {
+            statusElement.className = "status status-error";
+            statusElement.textContent = "输入错误";
+            resultArea.innerHTML = '<div class="error-message">请输入有效的接口地址</div>';
+            return;
+        }
+
+        // 加载状态
+        statusElement.className = "status status-loading";
+        statusElement.textContent = "加载中...";
+        resultArea.innerHTML = '<div class="empty">正在获取玩家数据，请稍候...</div>';
+
+        try {
+            // 发起请求
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                throw new Error(`请求失败（状态码：${response.status}）`);
+            }
+            const data = await response.json();
+            console.log("接口返回数据：", data);
+
+            // 成功状态
+            statusElement.className = "status status-success";
+            statusElement.textContent = "加载成功";
+
+            // 解析并渲染玩家列表（适配常见的排行榜数据结构）
+            // 假设数据结构：{code:200, data:{list:[{id,name,level,power,server,clan,profession,updateTime},...], total}}
+            if (data.code === 200 && data.data?.list && data.data.list.length > 0) {
+                const players = data.data.list;
+                let html = '<ul class="player-list">';
+
+                players.forEach((player, index) => {
+                    // 排名样式（1-3名特殊颜色）
+                    const rank = index + 1;
+                    let rankClass = "rank-other";
+                    if (rank === 1) rankClass = "rank-1";
+                    else if (rank === 2) rankClass = "rank-2";
+                    else if (rank === 3) rankClass = "rank-3";
+
+                    // 职业标签样式（根据职业动态匹配）
+                    let tagClass = "tag-other";
+                    let tagText = "未知";
+                    if (player.profession === "太阴") {
+                        tagClass = "tag-sun";
+                        tagText = "太阴";
+                    } else if (player.profession === "太一") {
+                        tagClass = "tag-taiyi";
+                        tagText = "太一";
+                    } else if (player.profession) {
+                        tagText = player.profession;
+                    }
+
+                    // 拼接玩家条目HTML
+                    html += `
+                            <li class="player-item">
+                                <div class="rank-number ${rankClass}">${rank}</div>
+                                <div class="player-info">
+                                    <div class="player-name">
+                                        ${player.name || "无名玩家"}
+                                        <span class="player-tag ${tagClass}">${tagText}</span>
+                                    </div>
+                                    <div class="player-stats">战力：${player.power || "0"}</div>
+                                    <div class="player-detail">
+                                        <div>等级：${player.level || "0"}</div>
+                                        <div class="server-clan">
+                                            区服：${player.server || "未知"}<br>
+                                            宗门：${player.clan || "无"}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="update-time">${player.updateTime || "刚刚"}</div>
+                            </li>
+                        `;
+                });
+
+                html += '</ul>';
+                // 添加分页信息
+                if (data.data.total) {
+                    html += `
+                            <div style="padding:15px; text-align:center; color:#8d6e63; font-size:0.9rem;">
+                                共 ${data.data.total} 名玩家 · 当前第 ${data.data.page || 1} 页
+                            </div>
+                        `;
+                }
+                resultArea.innerHTML = html;
+
+            } else {
+                // 数据结构不匹配时展示原始数据
+                resultArea.innerHTML = `
+                        <div style="padding:15px; color:#8d6e63;">
+                            数据格式未匹配，展示原始数据：
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+            }
+
+        } catch (error) {
+            // 错误处理
+            statusElement.className = "status status-error";
+            statusElement.textContent = "加载失败";
+
+            let errorMsg = error.message;
+            if (errorMsg.includes("CORS")) {
+                errorMsg += `
+                        <br><br>跨域解决方案：
+                        1. 在接口前添加代理：<br>
+                        https://cors-anywhere.herokuapp.com/${apiUrl}
+                        <br><br>2. 安装浏览器跨域插件（如Allow CORS）
+                    `;
+            }
+            resultArea.innerHTML = `<div class="error-message">${errorMsg}</div>`;
+            console.error("错误详情：", error);
+        }
+    }
+</script>
+</body>
+</html>
