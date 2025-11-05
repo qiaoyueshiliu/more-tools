@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主动古宝指南</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "SimSun", sans-serif;
+        }
+
+        body {
+            background-color: #f5f0e5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .site-title {
+            font-size: 2.2rem;
+            color: #8b5a2b;
+            text-align: center;
+            margin: 20px 0 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-description {
+            background-color: #fff8f0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #6d4c41;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background-color: #fff8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-header {
+            background-color: #d79e5b;
+            color: white;
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .category-body {
+            padding: 15px;
+        }
+
+        .data-item {
+            background-color: white;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #d79e5b;
+        }
+
+        .data-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .data-description {
+            font-weight: 500;
+            color: #3e2723;
+            margin-bottom: 8px;
+        }
+
+        .data-details {
+            font-size: 0.9rem;
+            color: #6d4c41;
+            line-height: 1.6;
+        }
+
+        .data-stats {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #f0e0cc;
+            font-size: 0.9rem;
+        }
+
+        .stat-label {
+            color: #795548;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: #c62828;
+        }
+
+        /* 图片样式调整 */
+        .item-image {
+            width: 100%;
+            margin: 10px 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #f0e0cc;
+            cursor: pointer;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 180px; /* 固定高度，与文字栏宽度匹配 */
+            object-fit: contain; /* 保持图片比例，完整显示 */
+            background-color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .item-image:hover img {
+            transform: scale(1.02);
+        }
+
+        /* 图片放大模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            cursor: grab;
+        }
+
+        .modal-content.grabbing {
+            cursor: grabbing;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border: 4px solid white;
+            border-radius: 8px;
+            transition: transform 0.1s ease;
+            transform-origin: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            z-index: 1001;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .zoom-controls button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .zoom-controls button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .reference {
+            background-color: #fff8f0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: #6d4c41;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .reference a {
+            color: #8b5a2b;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .site-title {
+                font-size: 1.8rem;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-image img {
+                height: 150px; /* 移动端调整高度 */
+            }
+
+            .close-modal {
+                top: -20px;
+                right: -20px;
+                font-size: 20px;
+            }
+
+            .zoom-controls {
+                bottom: -35px;
+                gap: 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="site-title">主动古宝指南</h1>
+
+    <div class="section-description">
+        在游戏中，主动古宝是不可或缺的重要部分。目前版本中主动古宝分为多种品质，以下是各类主动古宝的详细信息及获取方式。(2025-11-5)
+    </div>
+
+    <!-- 图片放大模态框 -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content" id="modalContent">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <img src="" alt="放大的古宝图片" class="modal-image" id="modalImage">
+            <div class="zoom-controls">
+                <button id="zoomOut">-</button>
+                <span id="zoomLevel">100%</span>
+                <button id="zoomIn">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-grid">
+        <!-- 紫色主动古宝 -->
+        <div class="category-card">
+            <div class="category-header">紫色主动古宝</div>
+            <div class="category-body">
+                <div class="item-image" onclick="openModal('主动古宝/灭魂剑_却邪剑.png')">
+                    <img src="主动古宝/灭魂剑_却邪剑.png" alt="灭魂剑与却邪剑">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">灭魂剑</div>
+                    <div class="data-details">
+                        60CD，攻击敌方两次两个目标，每次造成*法术伤害，附加回灵减弱，真元消耗降低60%，持续8秒。<br>
+                        升星效果：随着古宝提升伤害*%<br>
+                        五星效果：冷却时间减少20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">观影阁每观看两次广告获得5碎片</span>
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">却邪剑</div>
+                    <div class="data-details">
+                        60CD，攻击敌方两次两个目标，每次造成*物攻伤害，附加回灵减弱，真元消耗降低60%，持续8秒。<br>
+                        升星效果：随着古宝提升伤害*%<br>
+                        五星效果：冷却时间减少20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">观影阁每观看两次广告获得5碎片</span>
+                    </div>
+                </div>
+
+                <div class="item-image" onclick="openModal('主动古宝/五叶火莲_天火印.png')">
+                    <img src="主动古宝/五叶火莲_天火印.png" alt="五叶火莲与天火印">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">五叶火莲</div>
+                    <div class="data-details">
+                        60CD，对敌方造成五次*法术伤害。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">探宝活动抽取</span>
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">天火印</div>
+                    <div class="data-details">
+                        60CD，对敌方造成*物理伤害。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">探宝活动抽取</span>
+                    </div>
+                </div>
+
+                <div class="item-image" onclick="openModal('主动古宝/定海玉针_混元乾坤网.png')">
+                    <img src="主动古宝/定海玉针_混元乾坤网.png" alt="定海玉阵碎片与混元乾坤网碎片">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">定海玉阵碎片</div>
+                    <div class="data-details">
+                        60CD，对敌方两个目标造成两次伤害，每次造成*法术伤害，附加封寒，移速-50%，持续三秒。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">异界入侵任务，1500功勋兑换5碎片</span>
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">混元乾坤网碎片</div>
+                    <div class="data-details">
+                        60CD，对敌方造成*物理伤害，附加束缚，移动速度-75%，持续四秒。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">异界入侵任务，1500功勋兑换5碎片</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 金色主动古宝 -->
+        <div class="category-card">
+            <div class="category-header">金色主动古宝</div>
+            <div class="category-body">
+                <div class="item-image" onclick="openModal('主动古宝/泰阿剑_龙渊剑.png')">
+                    <img src="主动古宝/泰阿剑_龙渊剑.png" alt="太阿剑与龙渊剑">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">太阿剑</div>
+                    <div class="data-details">
+                        60CD，对敌放攻击2次，每次造成*物理伤害，附加气血减弱，气血回复降低50%，持续8秒。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        三星效果：回血减弱效果提升70%<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">购买每日6元礼包（人界1种，灵界额外2种）</span>
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">龙渊剑</div>
+                    <div class="data-details">
+                        60CD，对敌放攻击2次，每次造成*法术伤害，附加气血减弱，气血回复降低50%，持续8秒。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        三星效果：回血减弱效果提升70%<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">购买每日6元礼包</span>
+                    </div>
+                </div>
+
+                <div class="item-image" onclick="openModal('主动古宝/群妖镇世图_寒星囚龙戟.png')">
+                    <img src="主动古宝/群妖镇世图_寒星囚龙戟.png" alt="群妖镇世图与寒星囚龙戟">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">寒星囚龙戟</div>
+                    <div class="data-details">
+                        60CD，对敌方攻击2次造成*物理伤害，附加驱散，随机移除一个。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        三星效果：驱散移除目标提升两个<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">购买每日6元礼包</span>
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">群妖镇世图</div>
+                    <div class="data-details">
+                        60CD，对敌方3目标造成*法术伤害，附加驱散，随机移除一个。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        三星效果：驱散移除目标提升两个<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">购买每日6元礼包</span>
+                    </div>
+                </div>
+
+                <div class="item-image" onclick="openModal('主动古宝/太虚双凤琴_坤元量天尺.png')">
+                    <img src="主动古宝/太虚双凤琴_坤元量天尺.png" alt="太虚双凤琴与坤元量天尺">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">坤元量天尺</div>
+                    <div class="data-details">
+                        对敌方攻击3次每次造成*物理伤害，自身进入灵刃，每次神通攻击前额外附加物攻100%物理伤害，免疫驱散，持续两秒。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        三星效果：灵刃效果提升150%<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">购买每日6元礼包</span>
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">太虚双凤琴</div>
+                    <div class="data-details">
+                        对敌方攻击2次目标2个每次造成*法术伤害，自身进入秘咒，每次神通攻击前额外附加法攻100%法术伤害，免疫驱散，持续两秒。<br>
+                        升星效果：随着古宝提升伤害*<br>
+                        三星效果：秘咒效果提升150%<br>
+                        五星效果：冷却时间降低20%
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">购买每日6元礼包</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 特殊类主动古宝 -->
+        <div class="category-card">
+            <div class="category-header">特殊类主动古宝</div>
+            <div class="category-body">
+                <div class="item-image" onclick="openModal('主动古宝/乾坤镇妖塔.png')">
+                    <img src="主动古宝/乾坤镇妖塔.png" alt="乾坤镇妖塔">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">乾坤镇妖塔</div>
+                    <div class="data-details">
+                        镇妖塔作为人界爬塔赠与的特殊古宝，对于刷怪、打妖兽具有额外加成20%，是打妖兽刷怪必带的古宝。
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">人界爬塔奖励</span>
+                    </div>
+                </div>
+
+                <div class="item-image" onclick="openModal('主动古宝/极巅神兵图.png')">
+                    <img src="主动古宝/极巅神兵图.png" alt="极巅神兵图">
+                </div>
+                <div class="data-item">
+                    <div class="data-description">极巅神兵图</div>
+                    <div class="data-details">
+                        神兵图作为氪佬的专属主动古宝，伤害十分可观，适用于任何场景搭配。
+                    </div>
+                    <div class="data-stats">
+                        <span class="stat-label">获取方式：</span>
+                        <span class="stat-value">参加大道技巅活动</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 古宝使用建议 -->
+        <div class="category-card">
+            <div class="category-header">使用建议</div>
+            <div class="category-body">
+                <div class="data-item">
+                    <div class="data-description">低氪玩家推荐</div>
+                    <div class="data-details">
+                        灭魂剑、却邪剑、五叶火莲、天火印为低氪道友必备主动古宝，可作为前期过渡使用。
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">优先觉醒推荐</div>
+                    <div class="data-details">
+                        寒星囚龙戟、群妖镇世图（驱散效果实用，三星额外增加目标）<br>
+                        坤元量天尺、太虚双凤琴（增加神通伤害，搭配神通效果显著）
+                    </div>
+                </div>
+
+                <div class="data-item">
+                    <div class="data-description">特殊场景推荐</div>
+                    <div class="data-details">
+                        刷怪/打妖兽：必带乾坤镇妖塔（额外20%加成）<br>
+                        通用场景：极巅神兵图（伤害可观，适用范围广）
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reference">
+        参考来源：<a href="https://tieba.baidu.com/p/9791669483" target="_blank">百度贴吧 - 主动古宝详细指南</a>
+    </div>
+</div>
+
+<script>
+    // 图片放大功能
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const closeModal = document.getElementById('closeModal');
+    const modalContent = document.getElementById('modalContent');
+    const zoomIn = document.getElementById('zoomIn');
+    const zoomOut = document.getElementById('zoomOut');
+    const zoomLevel = document.getElementById('zoomLevel');
+
+    let scale = 1; // 初始缩放比例
+    const scaleStep = 0.1; // 每次缩放步长
+    const minScale = 0.5; // 最小缩放比例
+    const maxScale = 3; // 最大缩放比例
+    let isDragging = false;
+    let startX, startY;
+    let translateX = 0;
+    let translateY = 0;
+    let lastTranslateX = 0;
+    let lastTranslateY = 0;
+
+    // 打开模态框
+    function openModal(imageSrc) {
+        modal.style.display = 'flex';
+        modalImage.src = imageSrc;
+        document.body.style.overflow = 'hidden'; // 禁止背景滚动
+
+        // 重置缩放和位置
+        resetZoomAndPosition();
+    }
+
+    // 重置缩放和位置
+    function resetZoomAndPosition() {
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        lastTranslateX = 0;
+        lastTranslateY = 0;
+        updateImageTransform();
+        updateZoomLevel();
+    }
+
+    // 更新图片变换
+    function updateImageTransform() {
+        modalImage.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+    }
+
+    // 更新缩放级别显示
+    function updateZoomLevel() {
+        zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    // 缩放图片
+    function zoomImage(delta) {
+        // 计算新的缩放比例
+        const newScale = scale + delta;
+
+        // 限制缩放范围
+        if (newScale >= minScale && newScale <= maxScale) {
+            scale = newScale;
+            updateImageTransform();
+            updateZoomLevel();
+        }
+    }
+
+    // 关闭模态框
+    function closeModalFunc() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // 恢复背景滚动
+    }
+
+    // 事件监听 - 关闭按钮
+    closeModal.addEventListener('click', closeModalFunc);
+
+    // 事件监听 - 点击模态框背景关闭
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModalFunc();
+        }
+    });
+
+    // 事件监听 - 按ESC键关闭
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            closeModalFunc();
+        }
+    });
+
+    // 事件监听 - 滚轮缩放
+    modalImage.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        // 滚轮向上为正，向下为负
+        const delta = e.deltaY < 0 ? scaleStep : -scaleStep;
+        zoomImage(delta);
+    });
+
+    // 事件监听 - 缩放按钮
+    zoomIn.addEventListener('click', () => zoomImage(scaleStep));
+    zoomOut.addEventListener('click', () => zoomImage(-scaleStep));
+
+    // 拖动功能 - 鼠标按下
+    modalContent.addEventListener('mousedown', (e) => {
+        if (e.target === modalImage || e.target === modalContent) {
+            isDragging = true;
+            startX = e.clientX - lastTranslateX;
+            startY = e.clientY - lastTranslateY;
+            modalContent.classList.add('grabbing');
+        }
+    });
+
+    // 拖动功能 - 鼠标移动
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        updateImageTransform();
+    });
+
+    // 拖动功能 - 鼠标释放
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            lastTranslateX = translateX;
+            lastTranslateY = translateY;
+            modalContent.classList.remove('grabbing');
+        }
+    });
+
+    // 拖动功能 - 触摸设备支持
+    modalContent.addEventListener('touchstart', (e) => {
+        if (e.target === modalImage || e.target === modalContent) {
+            isDragging = true;
+            startX = e.touches[0].clientX - lastTranslateX;
+            startY = e.touches[0].clientY - lastTranslateY;
+            modalContent.classList.add('grabbing');
+        }
+    });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        translateX = e.touches[0].clientX - startX;
+        translateY = e.touches[0].clientY - startY;
+        updateImageTransform();
+    });
+
+    document.addEventListener('touchend', () => {
+        if (isDragging) {
+            isDragging = false;
+            lastTranslateX = translateX;
+            lastTranslateY = translateY;
+            modalContent.classList.remove('grabbing');
+        }
+    });
+</script>
+</body>
+</html>
